@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { MenuItem, OrderItem } from "../types";
 
 export default function useOrder() {
-    const [order, setOrder] = useState<OrderItem[]>([]);
+    const initialOrder : OrderItem[] = JSON.parse(localStorage.getItem('order') || '[]');
+
+    const [order, setOrder] = useState(initialOrder);
     const [tip, setTip] = useState(0);
+
+    useEffect(() => {
+        localStorage.setItem('order', JSON.stringify(order));
+    }, [order]);
 
     const addItem = (item : MenuItem) => {
         const itemExist = order.find( orderItem => orderItem.id === item.id);
@@ -18,6 +24,9 @@ export default function useOrder() {
     }
 
     const removeItem = (id: MenuItem['id']) => {
+        if(order.length === 1) {
+            setTip(0)
+        }
         setOrder(order.filter(item => item.id !== id));
     }
 
